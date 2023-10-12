@@ -234,10 +234,11 @@ void lista::displayNext() {
     }
 
     ListElement *current = head;
-    cout << "Zawartosc listy: ";
-    while (current != nullptr) {
-        cout << current->wartosc << " ";
-        current = current->next;
+    cout << "Nastepny element: ";
+    if (current->next != nullptr) {
+        cout << current->next->wartosc;
+    } else {
+        cout << "Brak nastepnego elementu.";
     }
     cout << endl;
 }
@@ -249,14 +250,11 @@ void lista::displayPrevious() {
     }
 
     ListElement *current = head;
-    ListElement *previous = nullptr;
-    cout << "Zawartosc listy (poprzednie elementy): ";
-    while (current != nullptr) {
-        if (previous != nullptr) {
-            cout << previous->wartosc << " ";
-        }
-        previous = current;
-        current = current->next;
+    cout << "Poprzedni element: ";
+    if (current->prev != nullptr) {
+        cout << current->prev->wartosc;
+    } else {
+        cout << "Brak poprzedniego elementu.";
     }
     cout << endl;
 }
@@ -298,7 +296,7 @@ switch(choice){
 
     case 0:
         cout<<"Wyjscie"<<endl;
-    break;
+    return 0;
 
     case 1:
         cout<<"Wybrano dodanie elementu na poczatek"<<endl;
@@ -381,9 +379,11 @@ cout<<"Aktualnie twoja lista jest pusta, wpisz pierwszy element, aby przeprawadz
 cin>>wartosc;
 L.addToFront(wartosc);
 
+int result;
 do {
-menu(L);
+result = menu(L);
 
-}while(true);
+}while(result!= 0
+       );
 return 0;
 }
