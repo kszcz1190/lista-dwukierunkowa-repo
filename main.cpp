@@ -6,7 +6,7 @@ struct ListElement {
     int wartosc;
     ListElement* prev;
     ListElement* next;
-    ListElement(int value ) : wartosc(value), prev(nullptr), next(nullptr){}
+    ListElement(int value) : wartosc(value), prev(nullptr), next(nullptr) {} // Konstruktor przyjmujący wartość
 };
 
 class lista {
@@ -21,8 +21,8 @@ lista(void): head(nullptr),tail(nullptr){};
 void addToFront(int wartosc); //dodawanie na poczatek
 void addToEnd (int wartosc); //dodawanie na koniec
 void addUnderIndex(int wartosc, int position); //dodawanie elementu pod wskazany index
-void removeFromBack(int a); //usuniecie z konca
-void removeFromFront(int a ); //usuniecie  z poczatku
+void removeFromBack(); //usuniecie z konca
+void removeFromFront(); //usuniecie  z poczatku
 void removeUnderIndex(int position); //usuniecie z podanego indexu
 void displayList(); //wyswietlenie listy
 void displayReverse(); // wyswietlenie listy w odwrotnej kolejnoœci
@@ -42,8 +42,8 @@ lista::~lista(void)
 
 void lista::addToFront(int value) {
 
-ListElement* newElement = new ListElement;
-newElement->data = value;
+ListElement *newElement = new ListElement(value);
+newElement->wartosc = value;
 newElement->prev = nullptr;
 newElement->next = head;
 
@@ -59,23 +59,182 @@ if(tail == nullptr){
 }
 
 void lista::addToEnd(int value) {
-ListElement* newElement = new ListElement;
-newElement->data = value;
-newElement->prev = tail;
-newElement->next = nullptr;
+    ListElement* newElement = new ListElement(value);
+    newElement->prev = tail;
+    newElement->next = nullptr;
 
-if( tail!= nullptr) {
-    tail->next = new ListElement;
+    if (tail != nullptr) {
+        tail->next = newElement;
+    }
+
+    tail = newElement;
+
+    if (head == nullptr) {
+        head = newElement;
+    }
 }
 
-tail = newElement;
+void lista::removeFromBack() {
+    if (tail != nullptr) {
+        ListElement *elementToRemove = tail;
 
-if(head == nullptr) {
-    head = newElement;
-}
+        if (elementToRemove->prev != nullptr) {
+            tail = elementToRemove->prev;
+            tail->next = nullptr;
+        } else {
+            // Jeśli to był ostatni element na liście
+            head = nullptr;
+            tail = nullptr;
+        }
+
+        delete elementToRemove;
+        cout << "Usunięto element z końca listy." << endl;
+    } else {
+        cout << "Lista jest pusta, nie można usunąć żadnego elementu." << endl;
+    }
 }
 
-int menu() {
+void lista::removeFromFront() {
+    if (head != nullptr) {
+        ListElement *elementToRemove = head;
+
+        if (elementToRemove->next != nullptr) {
+            head = elementToRemove->next;
+            head->prev = nullptr;
+        } else {
+            // Jeśli to był ostatni element na liście
+            head = nullptr;
+            tail = nullptr;
+        }
+
+        delete elementToRemove;
+        cout << "Usunięto element z początku listy." << endl;
+    } else {
+        cout << "Lista jest pusta, nie można usunąć żadnego elementu." << endl;
+    }
+}
+
+void lista::removeUnderIndex(int position) {
+    if (position < 0) {
+        cout << "Błędna pozycja. Indeks musi być nieujemny." << endl;
+        return;
+    }
+
+    if (head == nullptr) {
+        cout << "Lista jest pusta, nie można usunąć elementu." << endl;
+        return;
+    }
+
+    if (position == 0) {
+        removeFromFront();  // Jeśli usuwamy element o indeksie 0, wywołujemy removeFromFront
+        return;
+    }
+
+    ListElement *current = head;
+    int index = 0;
+
+    while (current != nullptr && index < position) {
+        current = current->next;
+        index++;
+    }
+
+    if (current == nullptr) {
+        cout << "Podana pozycja przekracza rozmiar listy." << endl;
+    } else {
+        // Usuwamy element na podanej pozycji
+        ListElement *elementToRemove = current;
+        if (elementToRemove->prev != nullptr) {
+            elementToRemove->prev->next = elementToRemove->next;
+        } else {
+            head = elementToRemove->next;
+        }
+        if (elementToRemove->next != nullptr) {
+            elementToRemove->next->prev = elementToRemove->prev;
+        } else {
+            tail = elementToRemove->prev;
+        }
+
+        delete elementToRemove;
+        cout << "Usunięto element z pozycji " << position << endl;
+    }
+}
+
+void lista::displayList() {
+    if (head == nullptr) {
+        cout << "Lista jest pusta." << endl;
+        return;
+    }
+
+    ListElement *current = head;
+    cout << "Zawartość listy: ";
+    while (current != nullptr) {
+        cout << current->wartosc << " ";
+        current = current->next;
+    }
+    cout << endl;
+}
+
+void lista::displayReverse() {
+    if (tail == nullptr) {
+        cout << "Lista jest pusta." << endl;
+        return;
+    }
+
+    ListElement *current = tail;
+    cout << "Zawartość listy (odwrotna kolejność): ";
+    while (current != nullptr) {
+        cout << current->wartosc << " ";
+        current = current->prev;
+    }
+    cout << endl;
+}
+
+void lista::displayNext() {
+    if (head == nullptr) {
+        cout << "Lista jest pusta." << endl;
+        return;
+    }
+
+    ListElement *current = head;
+    cout << "Zawartość listy (kolejne elementy): ";
+    while (current != nullptr) {
+        cout << current->wartosc << " ";
+        current = current->next;
+    }
+    cout << endl;
+}
+
+void lista::displayPrevious() {
+    if (head == nullptr) {
+        cout << "Lista jest pusta." << endl;
+        return;
+    }
+
+    ListElement *current = head;
+    ListElement *previous = nullptr;
+    cout << "Zawartość listy (poprzednie elementy): ";
+    while (current != nullptr) {
+        if (previous != nullptr) {
+            cout << previous->wartosc << " ";
+        }
+        previous = current;
+        current = current->next;
+    }
+    cout << endl;
+}
+
+void lista::cleanList() {
+    while (head != nullptr) {
+        ListElement *temp = head;
+        head = head->next;
+        delete temp;
+    }
+    tail = nullptr;
+}
+
+
+int menu(lista& L) {
+
 
 int choice;                                            //menu operacji wykonywanych na liscie
 
@@ -98,76 +257,76 @@ int choice;                                            //menu operacji wykonywan
 switch(choice){
 
     case 0:
-
+        cout<<"Wyjscie"<<endl;
     break;
 
     case 1:
         cout<<"Wybrano dodanie elementu na poczatek"<<endl;
-        int wartosc;
+        int a;
         cout<<"Podaj wartosc elementu";
-        cin>>wartosc;
-        L.addToFront(wartosc);
+        cin>>a;
+        L.addToFront(a);
         break;
 
     case 2:
         cout<<"Wybrano dodanie elementu na koniec"<<endl;
-        int wartosc;
+        int b;
         cout<<"Podaj wartosc elementu";
-        cin>>wartosc;
-        L.addToEnd(wartosc);
+        cin>>b;
+        L.addToEnd(b);
         break;
 
     case 3:
        cout<<"Wybrano dodanie elementu pod wskazany przez ciebie index"<<endl;
-       int wartosc, position;
+       int c, p1;
        cout<<"Podaj wartosc elementu";
-       cin>>wartosc;
+       cin>>c;
        cout<<"Podaj index elementu";
-       cin>>position;
-       L.addUnderIndex(wartosc, position);
+       cin>>p1;
+       L.addUnderIndex(c, p1);
        break;
 
     case 4:
         cout<<"Wybrano usuniecie elementu z konca listy"<<endl;
-        removeFromBack();
+        L.removeFromBack();
         break;
 
     case 5:
         cout<<"Wybrano usuniecie elementu z poczatku listy"<<endl;
-        removeFromFront();
+        L.removeFromFront();
         break;
 
     case 6:
         cout<<"Wybrano usuniecie elementu ze wskazanego przez ciebie indexu"<<endl;
-        int position;
+        int p2;
         cout<<"Podaj index elementu";
-        cin>>position;
-        L.removeUnderIndex(position);
+        cin>>p2;
+        L.removeUnderIndex(p2);
         break;
 
     case 7:
         cout<<"Wybrano wyswietlenie listy"<<endl;
-        displayList();
+        L.displayList();
         break;
 
     case 8:
         cout<<"Wybrano wyswietlenie listy w odwrotnej kolejnosci"<<endl;
-        displayReverse();
+        L.displayReverse();
         break;
 
     case 9:
         cout<<"Wybrano wyswietlenie nastepnego elementu"<<endl;
-        displayNext();
+        L.displayNext();
         break;
 
     case 10:
         cout<<"Wybrano wyswietlenie poprzedniego elementu"<<endl;
-        displayPrevious();
+        L.displayPrevious();
         break;
 
     case 11:
         cout<<"Wybrano wyczyszczenie listy";
-        cleanList();
+        L.cleanList();
         break;
 
 }
@@ -176,12 +335,14 @@ switch(choice){
 int main (int argc, char** argv){
 
 lista L;
+int wartosc;
 
 cout<<"Aktualnie twoja lista jest pusta, dodaj do niej element, aby przeprawadzic na niej inne operacje"<<endl;
 L.addToFront(wartosc);
+
 do {
+menu(L);
 
-menu();
-
-}while
+}while(true);
+return 0;
 }
